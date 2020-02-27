@@ -25,6 +25,6 @@ class butt(node):
 
     def connect(self, ISP):
         if (self.peers != None):
-            self.peers.remove(self.ID)
-        self.peers = ISP.ID
-        ISP.peers.append(self.ID)
+            self.peers.peers.remove(self)
+        self.peers = ISP
+        ISP.peers.append(self)
