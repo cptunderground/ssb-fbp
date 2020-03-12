@@ -130,3 +130,6 @@ dmypy.json
 
 # idea files
 *.idea
+
+# json files
+log.json
