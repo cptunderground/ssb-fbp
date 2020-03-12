@@ -1,3 +1,4 @@
+import argparse
 import os
 import json
 import node
@@ -7,12 +8,11 @@ import networkx as nx
 def initLog(verbose: bool = False):
     print('start retrieving your log')
 
-    #starting sbot server
+    # starting sbot server
     '''
     cmd = 'sbot start'
     os.popen(cmd)
     '''
-
 
     cmd = 'sbot whoami'
     stream = os.popen(cmd)
@@ -31,10 +31,26 @@ def initLog(verbose: bool = False):
     print('executed command:', cmd)
     print('log saved as log.json')
 
+    def str2bool(v):
+        if isinstance(v, bool):
+            return v
+        if v.lower() in ('yes', 'true', 't', 'y', '1'):
+            return True
+        elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+            return False
+        else:
+            raise argparse.ArgumentTypeError('Boolean value expected.')
+
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process command line arguments for the ssb-fbp')
+    parser.add_argument('-v', dest='verbose', nargs='?', const=True, default=False,
+                        help='Display all actions of the ssb-fbp')
+    parser.add_argument('--verbose', dest='verbose', nargs='?', const=True, default=False,
+                        help='Display all actions of the ssb-fbp')
+    args = parser.parse_args()
 
-    initLog(verbose=False)
+    initLog(verbose=args.verbose)
 
     '''
     basel = node.ISP('basel', 3)
