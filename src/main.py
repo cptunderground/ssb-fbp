@@ -17,7 +17,8 @@ def initLog(verbose: bool = False, id: str = None):
         print('start retrieving your log')
 
         id = whoami()
-
+    else:
+        print('start retrieving ' + id + ' log')
     cmd = 'sbot createUserStream --id ' + id
     if (verbose):
         print('executing command:', cmd)
@@ -61,7 +62,6 @@ def initPeers(verbose: bool = False):
     for peer in data:
         if data[peer] == 0 or data[peer] == 1:
             peers.append(peer)
-            print(peer)
 
 
 def whoami():
