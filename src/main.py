@@ -31,15 +31,34 @@ def initLog(verbose: bool = False):
     print('executed command:', cmd)
     print('log saved as log.json')
 
-    def str2bool(v):
-        if isinstance(v, bool):
-            return v
-        if v.lower() in ('yes', 'true', 't', 'y', '1'):
-            return True
-        elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-            return False
-        else:
-            raise argparse.ArgumentTypeError('Boolean value expected.')
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+def initPeers(verbose: bool = False):
+    id = whoami()
+    cmd = 'sbot friends.hops ' + id
+    stream = os.popen(cmd)
+    cmd = cmd + ' > peers.json'
+    os.popen(cmd)
+
+
+def whoami():
+    cmd = 'sbot whoami'
+    stream = os.popen(cmd)
+    print('executing command:', cmd)
+    output = stream.read()
+    id = json.loads(output)
+    print('extracted ID:', id['id'])
+    return id['id']
 
 
 if __name__ == '__main__':
@@ -51,6 +70,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     initLog(verbose=args.verbose)
+    initPeers(verbose=args.verbose)
 
     '''
     basel = node.ISP('basel', 3)
