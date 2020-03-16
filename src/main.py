@@ -1,35 +1,38 @@
 import argparse
 import os
 import json
+import time
+
+import ndjson
 import node
 import networkx as nx
 
+global peers
+peers = []
 
-def initLog(verbose: bool = False):
-    print('start retrieving your log')
 
-    # starting sbot server
-    '''
-    cmd = 'sbot start'
-    os.popen(cmd)
-    '''
+def initLog(verbose: bool = False, id: str = None):
+    if id == None:
+        print('no id to initialise feed')
+        print('start retrieving your log')
 
-    cmd = 'sbot whoami'
-    stream = os.popen(cmd)
-    print('executing command:', cmd)
-    output = stream.read()
-    id = json.loads(output)
-    print('extracted ID:', id['id'])
+        id = whoami()
 
-    cmd = 'sbot createUserStream --id ' + id['id']
+    cmd = 'sbot createUserStream --id ' + id
     if (verbose):
         print('executing command:', cmd)
         stream = os.popen(cmd)
         output = stream.read()
         print(output)
-    os.popen(cmd + ' > log.json')
+
+    escapedID = escapeID(id)
+    os.popen(cmd + ' > logs/' + escapedID + '.json')
     print('executed command:', cmd)
-    print('log saved as log.json')
+    print('log saved as ' + escapedID + '.json')
+
+
+def escapeID(id):
+    return id.replace('/', '_')
 
 
 def str2bool(v):
@@ -45,10 +48,20 @@ def str2bool(v):
 
 def initPeers(verbose: bool = False):
     id = whoami()
-    cmd = 'sbot friends.hops ' + id
+    cmd = 'sbot friends.hops ' + id + ' | grep 1,'
     stream = os.popen(cmd)
+    output = stream.read()
     cmd = cmd + ' > peers.json'
     os.popen(cmd)
+    time.sleep(1)
+
+    data = json.loads('{' + output + '"end":2}')
+
+    global peers
+    for peer in data:
+        if data[peer] == 0 or data[peer] == 1:
+            peers.append(peer)
+            print(peer)
 
 
 def whoami():
@@ -69,8 +82,13 @@ if __name__ == '__main__':
                         help='Display all actions of the ssb-fbp')
     args = parser.parse_args()
 
-    initLog(verbose=args.verbose)
+    initLog(verbose=args.verbose, id=None)
     initPeers(verbose=args.verbose)
+
+    peers
+
+    for peer in peers:
+        initLog(verbose=args.verbose, id=peer)
 
     '''
     basel = node.ISP('basel', 3)
